@@ -3,6 +3,11 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="Autofac" Version="8.0.0" />
+    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Configuration" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     <PackageVersion Include="NLog" Version="5.2.8" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.8" />

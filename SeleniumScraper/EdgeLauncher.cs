@@ -1,6 +1,4 @@
-﻿using NLog;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
+﻿using Microsoft.Extensions.Logging;
 using OpenQA.Selenium.Edge;
 
 namespace SeleniumScraper
@@ -10,9 +8,9 @@ namespace SeleniumScraper
         private const string EdgeDriverPath = @"C:\Dev\drivers\msedgedriver.exe";
         private readonly string EdgeUserDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft\\Edge\\User Data1");
         private readonly EdgeDriver _driver;
-        private readonly ILogger _logger;
+        private readonly ILogger<EdgeLauncher> _logger;
 
-        public EdgeLauncher(ILogger logger)
+        public EdgeLauncher(ILogger<EdgeLauncher> logger)
         {
             var edgeOptions = new EdgeOptions();
             edgeOptions.AddArgument($"--user-data-dir={EdgeUserDataPath}");
@@ -35,7 +33,7 @@ namespace SeleniumScraper
         public void Dispose()
         {
             _driver?.Quit();
-            _logger.Log(NLog.LogLevel.Info, $"EdgeLauncher - Stoped");
+            _logger.LogInformation($"EdgeLauncher - Stoped");
             GC.SuppressFinalize(this);
         }
     }

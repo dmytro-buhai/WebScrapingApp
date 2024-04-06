@@ -1,6 +1,6 @@
 ﻿using NLog;
 using SeleniumScraper;
-using SeleniumScraper.Commands;
+using WebScrapingApp;
 
 public class Program
 {
@@ -11,19 +11,21 @@ public class Program
     {
         Logger.Info("Program starting...");
 
-        var edgeLauncher = new EdgeLauncher(Logger);
+        Startup.StartApplication();
+
+        //var edgeLauncher = new EdgeLauncher(Logger);
 
         //var twitterURL = "https://twitter.com/home";
 
-        var url = WriteMessageWaitForInputData("Enter URL to navigate: ");
+        //var url = WriteMessageWaitForInputData("Enter URL to navigate: ");
 
-        var navigateCommand = new NavigateCommand(edgeLauncher.GetEdgeDriver(), Logger, url);
+        //var navigateCommand = new NavigateCommand(edgeLauncher.GetEdgeDriver(), Logger, url);
 
-        navigateCommand.Execute();
+        //navigateCommand.Execute();
 
-        Thread.Sleep(5000);
+        //Thread.Sleep(5000);
 
-        edgeLauncher.Dispose();
+        //edgeLauncher.Dispose();
     }
 
     public static string WriteMessageWaitForInputData(string message)
