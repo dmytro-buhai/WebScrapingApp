@@ -1,29 +1,60 @@
 ﻿using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Edge;
 using SeleniumScraper.CommandsDomain.Abstract;
+using System.Text.RegularExpressions;
 
 namespace SeleniumScraper.CommandsDomain.Commands;
 
-public class NavigateCommand(EdgeDriver webDriver, ILogger logger) : EdgeCommand(webDriver, logger)
+public class NavigateCommand(EdgeLauncher edgeLauncher, ILogger logger) : ICommand
 {
-    public string UrlToNavigate { get; set; }
+    private EdgeDriver EdgeDriver { get => edgeLauncher.GetEdgeDriver(); }
 
-    public override string DisplayCommandName => "Navigate to URL";
+    public string UrlToNavigate { get; set; } = "https://twitter.com/home";
 
-    public override int Id { get => KnownCommands.NavigateCommand; }
+    public string DisplayCommandName => "Navigate to URL";
 
-    public override void ExecuteCommand()
+    public int Id { get => KnownCommands.NavigateCommand; }
+
+    public void ExecuteCommand()
     {
         try
         {
-            Console.Write("Please provide an url to navigate: ");
-            UrlToNavigate = Console.ReadLine();
-            Logger.LogInformation($"Navigate to {UrlToNavigate}");
-            WebDriver.Url = UrlToNavigate;
+            GetUrlFromUser();
+            ValidateUrl(UrlToNavigate);
+
+            logger.LogInformation($"Navigating to {UrlToNavigate}");
+            EdgeDriver.Url = UrlToNavigate;
+        }
+        catch (UriFormatException ex)
+        {
+            logger.LogError("Invalid URL format.", ex);
+        }
+        catch (WebDriverException ex)
+        {
+            logger.LogError("Webdriver error during navigation.", ex);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex.Message);
+            logger.LogError("An unexpected error occurred.", ex);
+        }
+    }
+
+    private void GetUrlFromUser()
+    {
+        Console.Write("Please provide a URL to navigate (or press Enter to use default): ");
+        string url = Console.ReadLine()!;
+        UrlToNavigate = string.IsNullOrEmpty(url) ? UrlToNavigate : url;
+    }
+
+    private void ValidateUrl(string url)
+    {
+        var pattern = @"^(http|https)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+        var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+
+        if (!regex.IsMatch(url))
+        {
+            throw new UriFormatException("Invalid URL format.");
         }
     }
 }

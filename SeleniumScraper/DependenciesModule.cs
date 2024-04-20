@@ -26,16 +26,34 @@ namespace SeleniumScraper
             builder.Populate(services);
 
             // Selenium 
-            builder.RegisterType<EdgeLauncher>().AsSelf();
+            builder.RegisterType<EdgeLauncher>().AsSelf().SingleInstance();
 
-            // Commands
+            // Commands in order
             builder.Register(context =>
             {
                 var edgeLauncher = context.Resolve<EdgeLauncher>();
-                var webDriver = edgeLauncher.GetEdgeDriver();
+                var logger = context.Resolve<ILogger<StartLauncherCommand>>();
+                return new StartLauncherCommand(edgeLauncher, logger);
+            }).As<StartLauncherCommand>().As<ICommand>().InstancePerLifetimeScope();
+
+            builder.Register(context =>
+            {
+                var edgeLauncher = context.Resolve<EdgeLauncher>();
                 var logger = context.Resolve<ILogger<NavigateCommand>>();
-                return new NavigateCommand(webDriver, logger);
+                return new NavigateCommand(edgeLauncher, logger);
             }).As<NavigateCommand>().As<ICommand>().InstancePerLifetimeScope();
+
+            //..
+
+
+            //...
+
+            builder.Register(context =>
+            {
+                var edgeLauncher = context.Resolve<EdgeLauncher>();
+                var logger = context.Resolve<ILogger<StopLauncherCommand>>();
+                return new StopLauncherCommand(edgeLauncher, logger);
+            }).As<StopLauncherCommand>().As<ICommand>().InstancePerLifetimeScope();
 
             // Services
             builder.RegisterType<CommandManager>().As<ICommandManager>().SingleInstance();
