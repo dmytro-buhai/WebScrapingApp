@@ -9,20 +9,20 @@ namespace SeleniumScraper
         private readonly string EdgeUserDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft\\Edge\\User Data1");
         private readonly ILogger<EdgeLauncher> _logger;
         
-        private readonly EdgeDriverService _edgeDriverService;
-        private readonly EdgeOptions _edgeOptions;
+        public EdgeDriverService EdgeDriverService {get; private set;}
+        public EdgeOptions EdgeOptions {get; private set;}
 
         private EdgeDriver? Driver { get; set; } 
 
         public EdgeLauncher(ILogger<EdgeLauncher> logger)
         {
-            _edgeDriverService = EdgeDriverService.CreateDefaultService(EdgeDriverPath);
-            _edgeDriverService.HideCommandPromptWindow = true;
+            EdgeDriverService = EdgeDriverService.CreateDefaultService(EdgeDriverPath);
+            EdgeDriverService.HideCommandPromptWindow = true;
 
-            _edgeOptions = new EdgeOptions();
-            _edgeOptions.AddArgument("--remote-debugging-port=9222");
-            _edgeOptions.AddArgument($"--user-data-dir={EdgeUserDataPath}");
-            _edgeOptions.AddArgument("--profile-directory=Profile 1");
+            EdgeOptions = new EdgeOptions();
+            EdgeOptions.AddArgument("--remote-debugging-port=9222");
+            EdgeOptions.AddArgument($"--user-data-dir={EdgeUserDataPath}");
+            EdgeOptions.AddArgument("--profile-directory=Profile 1");
             
             _logger = logger;
         }
@@ -31,7 +31,8 @@ namespace SeleniumScraper
 
         public void StartLauncher()
         {
-            Driver = new EdgeDriver(_edgeDriverService, _edgeOptions);
+            _logger.LogInformation("EdgeLauncher - Started");
+            Driver = new EdgeDriver(EdgeDriverService, EdgeOptions);
         }
 
         public void StopLauncher()

@@ -14,7 +14,6 @@ namespace SeleniumScraper.Services.Commands
 
             while (true)
             {
-                Console.Clear();
                 Console.WriteLine(_info);
                 Console.Write("Execute command №: ");
                 var input = Console.ReadLine();

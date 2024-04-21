@@ -13,8 +13,8 @@ public class StartLauncherCommand(EdgeLauncher edgeLauncher, ILogger logger) : I
     {
         try
         {
-            edgeLauncher.StartLauncher();
             logger.LogInformation($"Starting web driver...");
+            edgeLauncher.StartLauncher();
         }
         catch (Exception ex)
         {
