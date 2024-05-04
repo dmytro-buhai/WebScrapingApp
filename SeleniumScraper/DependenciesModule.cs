@@ -43,8 +43,14 @@ namespace SeleniumScraper
                 return new NavigateCommand(edgeLauncher, logger);
             }).As<NavigateCommand>().As<ICommand>().InstancePerLifetimeScope();
 
-            //..
+            //...
 
+            builder.Register(context =>
+            {
+                var edgeLauncher = context.Resolve<EdgeLauncher>();
+                var logger = context.Resolve<ILogger<SelectNewsPost>>();
+                return new SelectNewsPost(edgeLauncher, logger);
+            }).As<SelectNewsPost>().As<ICommand>().InstancePerLifetimeScope();
 
             //...
 

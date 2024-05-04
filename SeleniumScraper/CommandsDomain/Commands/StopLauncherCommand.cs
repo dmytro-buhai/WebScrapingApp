@@ -7,7 +7,7 @@ public class StopLauncherCommand(EdgeLauncher edgeLauncher, ILogger logger) : IC
 {
     public string DisplayCommandName => "Stop driver";
 
-    public int Id { get => KnownCommands.StopLauncherCommand; }
+    public int Id => KnownCommands.StopLauncherCommand;
 
     public void ExecuteCommand()
     {

@@ -10,7 +10,7 @@ public class NavigateCommand(EdgeLauncher edgeLauncher, ILogger logger) : IComma
 {
     private EdgeDriver EdgeDriver { get => edgeLauncher.GetEdgeDriver(); }
 
-    public string UrlToNavigate { get; set; } = "https://twitter.com/home";
+    public string UrlToNavigate { get; set; } = "https://twitter.com/nafoviking/status/1786415483924672635";
 
     public string DisplayCommandName => "Navigate to URL";
 

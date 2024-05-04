@@ -7,7 +7,7 @@ public class StartLauncherCommand(EdgeLauncher edgeLauncher, ILogger logger) : I
 {
     public string DisplayCommandName => "Start driver";
 
-    public int Id { get => KnownCommands.StartLauncherCommand; }
+    public int Id => KnownCommands.StartLauncherCommand;
 
     public void ExecuteCommand()
     {
