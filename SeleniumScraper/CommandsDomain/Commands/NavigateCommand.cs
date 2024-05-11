@@ -16,7 +16,7 @@ public class NavigateCommand(IUserInterfaceService userInterfaceService,
 
     private EdgeDriver EdgeDriver { get => edgeLauncher.GetEdgeDriver(); }
 
-    public string UrlToNavigate { get; set; } = "https://twitter.com/nafoviking/status/1786415483924672635";
+    public string UrlToNavigate { get; set; } = "https://twitter.com/borisjohnson/status/1789204110417260575";
 
     public string DisplayCommandName => "Navigate to URL";
 

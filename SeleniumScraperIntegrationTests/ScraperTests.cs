@@ -49,7 +49,7 @@ namespace SeleniumScraperIntegrationTests
 
             //Navigate to test url
             var navigateCommand = (NavigateCommand)commandProcessor.FindCommand(2);
-            navigateCommand.UrlToNavigate = "https://twitter.com/nafoviking/status/1786415483924672635";
+            navigateCommand.UrlToNavigate = "https://twitter.com/borisjohnson/status/1789204110417260575";
             navigateCommand.ExecuteCommand();
 
             //Wait for page is loaded
