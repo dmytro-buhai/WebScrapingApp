@@ -1,13 +1,19 @@
 ﻿using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Support.UI;
 using SeleniumScraper.CommandsDomain.Abstract;
+using SeleniumScraper.Services;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace SeleniumScraper.CommandsDomain.Commands;
 
-public class NavigateCommand(EdgeLauncher edgeLauncher, ILogger logger) : ICommand
+public class NavigateCommand(IUserInterfaceService userInterfaceService, 
+    EdgeLauncher edgeLauncher, ILogger<NavigateCommand> logger) : ICommand
 {
+    public IUserInterfaceService UserInterfaceService { get => userInterfaceService; }
+
     private EdgeDriver EdgeDriver { get => edgeLauncher.GetEdgeDriver(); }
 
     public string UrlToNavigate { get; set; } = "https://twitter.com/nafoviking/status/1786415483924672635";
@@ -24,26 +30,29 @@ public class NavigateCommand(EdgeLauncher edgeLauncher, ILogger logger) : IComma
             ValidateUrl(UrlToNavigate);
 
             logger.LogInformation($"Navigating to {UrlToNavigate}");
-            EdgeDriver.Url = UrlToNavigate;
+
+            EdgeDriver.Navigate().GoToUrl(UrlToNavigate);
+
+            WebDriverWait wait = new WebDriverWait(EdgeDriver, TimeSpan.FromSeconds(5));
+            wait.Until(driver => ((IJavaScriptExecutor)driver).ExecuteScript("return document.readyState").Equals("complete"));
         }
         catch (UriFormatException ex)
         {
-            logger.LogError("Invalid URL format.", ex);
+            logger.LogError($"Invalid URL format: {ex.Message}");
         }
         catch (WebDriverException ex)
         {
-            logger.LogError("Webdriver error during navigation.", ex);
+            logger.LogError($"Webdriver error during navigation: {ex.Message}");
         }
         catch (Exception ex)
         {
-            logger.LogError("An unexpected error occurred.", ex);
+            logger.LogError($"An unexpected error occurred: {ex.Message}");
         }
     }
 
     private void GetUrlFromUser()
     {
-        Console.Write("Please provide a URL to navigate (or press Enter to use default): ");
-        string url = Console.ReadLine()!;
+        var url = UserInterfaceService.ReadInput("Please provide a URL to navigate (or press Enter to use default): ");
         UrlToNavigate = string.IsNullOrEmpty(url) ? UrlToNavigate : url;
     }
 

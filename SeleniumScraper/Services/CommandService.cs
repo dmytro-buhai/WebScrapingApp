@@ -3,9 +3,12 @@ using System.Text;
 
 namespace SeleniumScraper.Services.Commands
 {
-    public class CommandService(ICommandProcessor commandProcessor)
+    public class CommandService(ICommandProcessor commandProcessor, IUserInterfaceService userInterfaceService)
     {
-        private readonly ICommandProcessor _processor = commandProcessor;
+        public ICommandProcessor CommandProcessor { get; set; } = commandProcessor;
+
+        public IUserInterfaceService UserInterfaceService { get => userInterfaceService; }
+
         private string _info = string.Empty;
 
         public void Start()
@@ -14,9 +17,9 @@ namespace SeleniumScraper.Services.Commands
 
             while (true)
             {
-                Console.WriteLine(_info);
-                Console.Write("Execute command №: ");
-                var input = Console.ReadLine();
+                UserInterfaceService.DisplayMessage(_info);
+                UserInterfaceService.DisplayMessage("Execute command №: ");
+                var input = UserInterfaceService.ReadInput();
 
                 if (string.IsNullOrWhiteSpace(input)
                     ||
@@ -25,22 +28,22 @@ namespace SeleniumScraper.Services.Commands
                     continue;
                 }
 
-                foreach (var cmd in _processor.Commands)
+                foreach (var cmd in CommandProcessor.Commands)
                 {
                     if (cmd.Id == command)
                     {
-                        _processor.Process(command);
+                        CommandProcessor.Process(command);
                     }
                 }
-                Console.WriteLine("RETURN to continue...");
-                Console.ReadLine();
+                UserInterfaceService.DisplayMessage("RETURN to continue...");
+                UserInterfaceService.ReadInput();
             }
         }
 
         private void SetupInfo()
         {
             var sb = new StringBuilder();
-            var commands = _processor.Commands;
+            var commands = CommandProcessor.Commands;
 
             sb.AppendLine("Enter command number:");
 

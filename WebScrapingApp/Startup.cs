@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Microsoft.Extensions.Logging;
 using SeleniumScraper;
 using SeleniumScraper.Services.Commands;
 

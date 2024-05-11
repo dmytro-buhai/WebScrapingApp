@@ -1,10 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using SeleniumScraper.CommandsDomain.Abstract;
+using SeleniumScraper.Services;
 
 namespace SeleniumScraper.CommandsDomain.Commands;
 
-public class StopLauncherCommand(EdgeLauncher edgeLauncher, ILogger logger) : ICommand
+public class StopLauncherCommand(IUserInterfaceService userInterfaceService, 
+    EdgeLauncher edgeLauncher, ILogger<StopLauncherCommand> logger) : ICommand
 {
+    public IUserInterfaceService UserInterfaceService { get => userInterfaceService; }
+
     public string DisplayCommandName => "Stop driver";
 
     public int Id => KnownCommands.StopLauncherCommand;
