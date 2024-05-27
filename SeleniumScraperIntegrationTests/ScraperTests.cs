@@ -23,7 +23,9 @@ namespace SeleniumScraperIntegrationTests
             {
                 var testUIService = new Mock<IUserInterfaceService>();
                 testUIService.Setup(x => x.DisplayMessage(Capture.In(CommandOutputMessages)));
+                
                 testUIService.Setup(x => x.ReadInput(It.IsAny<string>())).Returns(string.Empty);
+                testUIService.Setup(x => x.ReadInput("Enter number of comments to read: ")).Returns("10");
 
                 return testUIService.Object;
             }).As<IUserInterfaceService>();
