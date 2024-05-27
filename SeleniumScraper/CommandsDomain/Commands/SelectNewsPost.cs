@@ -13,7 +13,7 @@ public class SelectNewsPost(IUserInterfaceService userInterfaceService,
 {
     public IUserInterfaceService UserInterfaceService { get => userInterfaceService; }
 
-    public string DisplayCommandName => "Select first 10 comments";
+    public string DisplayCommandName => "Read comments";
 
     public int Id => KnownCommands.GetPostComments;
 
@@ -29,15 +29,13 @@ public class SelectNewsPost(IUserInterfaceService userInterfaceService,
 
         if (parsedComments.Count > 0)
         {
-            UserInterfaceService.DisplayMessage(string.Join("\n", parsedComments));
+            logger.LogInformation("Operation was completed successfully.");
         }
         else
         {
             var noCommentsToDisplayMessage = $"No comments to display. The requested number of comments is {commentsCountInString}";
             UserInterfaceService.DisplayMessage(noCommentsToDisplayMessage);
         }
-        
-        logger.LogInformation("Operation is finished.");
     }
 
     public List<string> GetComments(int commentsCount)
@@ -60,7 +58,7 @@ public class SelectNewsPost(IUserInterfaceService userInterfaceService,
         {
             try
             {
-                while (Tweets.Distinct().Count() <= 10)
+                while (Tweets.Distinct().Count() <= commentsCount)
                 {
                     // Wait for page to load using WebDriverWait for better handling
                     WebDriverWait wait = new WebDriverWait(_edgeDriver, TimeSpan.FromSeconds(10));
