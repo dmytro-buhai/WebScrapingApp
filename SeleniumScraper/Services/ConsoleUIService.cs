@@ -8,8 +8,20 @@ namespace SeleniumScraper.Services
         {
             Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.WriteLine(message);
+        }
+
+        public void DisplayMessageInline(string message)
+        {
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
+            Console.Write(message);
         }        
         
+        public void DisplayMessageInline([StringSyntax("CompositeFormat")] string format, params object?[]? arg)
+        {
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
+            Console.Write(format, arg);
+        }
+
         public void DisplayMessage([StringSyntax("CompositeFormat")] string format, params object?[]? arg)
         {
             Console.OutputEncoding = System.Text.Encoding.Unicode;

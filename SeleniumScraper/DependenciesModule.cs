@@ -9,6 +9,8 @@ using SeleniumScraper.CommandsDomain.Commands;
 using SeleniumScraper.CommandsDomain.Managers;
 using SeleniumScraper.Services;
 using SeleniumScraper.Services.Commands;
+using System.Data;
+using System.Net.Http.Headers;
 
 namespace SeleniumScraper
 {
@@ -26,6 +28,8 @@ namespace SeleniumScraper
 
             builder.Populate(services);
 
+            builder.RegisterType<ProcessedData>().AsSelf().SingleInstance();
+
             // Selenium 
             builder.RegisterType<EdgeLauncher>().AsSelf().SingleInstance();
             builder.RegisterType<ConsoleUIService>().As<IUserInterfaceService>().SingleInstance();
@@ -33,40 +37,10 @@ namespace SeleniumScraper
             builder.RegisterType<StartLauncherCommand>().As<ICommand>().InstancePerLifetimeScope();
             builder.RegisterType<NavigateCommand>().As<ICommand>().InstancePerLifetimeScope();
             builder.RegisterType<SelectNewsPost>().As<ICommand>().InstancePerLifetimeScope();
+            builder.RegisterType<DisplayParsedComments>().As<ICommand>().InstancePerLifetimeScope();
             builder.RegisterType<StopLauncherCommand>().As<ICommand>().InstancePerLifetimeScope();
 
-            //// Commands in order
-            //builder.Register(context =>
-            //{
-            //    var edgeLauncher = context.Resolve<EdgeLauncher>();
-            //    var logger = context.Resolve<ILogger<StartLauncherCommand>>();
-            //    return new StartLauncherCommand(edgeLauncher, logger);
-            //}).As<StartLauncherCommand>().As<ICommand>().InstancePerLifetimeScope();
-
-            //builder.Register(context =>
-            //{
-            //    var edgeLauncher = context.Resolve<EdgeLauncher>();
-            //    var logger = context.Resolve<ILogger<NavigateCommand>>();
-            //    return new NavigateCommand(edgeLauncher, logger);
-            //}).As<NavigateCommand>().As<ICommand>().InstancePerLifetimeScope();
-
-            ////...
-
-            //builder.Register(context =>
-            //{
-            //    var edgeLauncher = context.Resolve<EdgeLauncher>();
-            //    var logger = context.Resolve<ILogger<SelectNewsPost>>();
-            //    return new SelectNewsPost(edgeLauncher, logger);
-            //}).As<SelectNewsPost>().As<ICommand>().InstancePerLifetimeScope();
-
-            ////...
-
-            //builder.Register(context =>
-            //{
-            //    var edgeLauncher = context.Resolve<EdgeLauncher>();
-            //    var logger = context.Resolve<ILogger<StopLauncherCommand>>();
-            //    return new StopLauncherCommand(edgeLauncher, logger);
-            //}).As<StopLauncherCommand>().As<ICommand>().InstancePerLifetimeScope();
+            
 
             // Services
             builder.RegisterType<CommandManager>().As<ICommandManager>().SingleInstance();

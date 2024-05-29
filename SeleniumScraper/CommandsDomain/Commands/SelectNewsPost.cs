@@ -5,10 +5,12 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using SeleniumScraper.CommandsDomain.Abstract;
 using SeleniumScraper.Services;
+using System.Data;
+using System.Text;
 
 namespace SeleniumScraper.CommandsDomain.Commands;
 
-public class SelectNewsPost(IUserInterfaceService userInterfaceService, 
+public class SelectNewsPost(ProcessedData processedData, IUserInterfaceService userInterfaceService, 
     EdgeLauncher edgeLauncher, ILogger<SelectNewsPost> logger) : ICommand
 {
     public IUserInterfaceService UserInterfaceService { get => userInterfaceService; }
@@ -19,17 +21,26 @@ public class SelectNewsPost(IUserInterfaceService userInterfaceService,
 
     private EdgeDriver _edgeDriver { get => edgeLauncher.GetEdgeDriver(); }
 
+    private const string DataFilePath = @"C:\dev\temp";
+
+    private List<string> UserNames = [];
+    private List<string> Dates = [];
+    private List<string> Comments = [];
+    private List<string> Replies = [];
+    private List<string> Retweets = [];
+    private List<string> Likes = [];
+
     public void ExecuteCommand()
     {
-        var commentsCountInString = UserInterfaceService.ReadInput("Enter number of comments to read: ");
+        var commentsCountInString = UserInterfaceService.ReadInput("Enter min number of comments to read: ");
         int.TryParse(commentsCountInString, out int commentsCount);
 
         logger.LogInformation("Start reading comments...");
-        var parsedComments = GetComments(commentsCount);
+        GetComments(commentsCount);
 
-        if (parsedComments.Count > 0)
+        if (Comments.Count > 0)
         {
-            logger.LogInformation("Operation was completed successfully.");
+            logger.LogInformation("Operation was completed successfully. Data stored in memory. Execute 'Save' command to save the data to a file.");
         }
         else
         {
@@ -38,27 +49,25 @@ public class SelectNewsPost(IUserInterfaceService userInterfaceService,
         }
     }
 
-    public List<string> GetComments(int commentsCount)
+    public void GetComments(int commentsCount)
     {
+        UserNames.Clear();
+        Dates.Clear();
+        Comments.Clear();
+        Replies.Clear();
+        Retweets.Clear();
+        Likes.Clear();
+
         if (commentsCount is not int or not > 0)
         {
-            return [];
+            return;
         }
-
-        var commentsList = new List<string>();
-
-        List<string> UserTags = [];
-        List<string> TimeStamps = [];
-        List<string> Tweets = [];
-        List<string> Replies = [];
-        List<string> Retweets = [];
-        List<string> Likes = [];
 
         if (_edgeDriver.Url.Contains("x.com") || _edgeDriver.Url.Contains("twitter.com"))
         {
             try
             {
-                while (Tweets.Distinct().Count() <= commentsCount)
+                while (Comments.Distinct().Count() <= commentsCount)
                 {
                     // Wait for page to load using WebDriverWait for better handling
                     WebDriverWait wait = new WebDriverWait(_edgeDriver, TimeSpan.FromSeconds(10));
@@ -69,26 +78,31 @@ public class SelectNewsPost(IUserInterfaceService userInterfaceService,
                     {
                         try
                         {
-                            string tweetText = article.FindElementSafe(By.CssSelector("div[lang]"))?.Text ?? string.Empty;
-
-                            if (!string.IsNullOrEmpty(tweetText) && !Tweets.Contains(tweetText))
+                            var tweetText = article.FindElementSafe(By.CssSelector("div[lang]"))?.Text ?? string.Empty;
+ 
+                            if (!string.IsNullOrEmpty(tweetText))
                             {
-                                Tweets.Add(tweetText);
+                                tweetText = tweetText.Replace("Translate with DeepL", string.Empty);
 
-                                string userTag = article.FindElementSafe(By.CssSelector("div[data-testid='User-Name'] > div"))?.Text ?? string.Empty;
-                                UserTags.Add(userTag);
+                                if (!Comments.Contains(tweetText))
+                                {
+                                    Comments.Add(tweetText);
 
-                                string timeStamp = article.FindElementSafe(By.CssSelector("time")).GetAttribute("datetime") ?? string.Empty;
-                                TimeStamps.Add(timeStamp);
+                                    string userTag = article.FindElementSafe(By.CssSelector("div[data-testid='User-Name'] > div"))?.Text ?? string.Empty;
+                                    UserNames.Add(userTag);
 
-                                string replyCount = article.FindElementSafe(By.CssSelector("button[data-testid='reply']"))?.Text ?? string.Empty;
-                                Replies.Add(replyCount);
+                                    string timeStamp = article.FindElementSafe(By.CssSelector("time")).GetAttribute("datetime") ?? string.Empty;
+                                    Dates.Add(timeStamp);
 
-                                string retweetCount = article.FindElementSafe(By.CssSelector("button[data-testid='retweet']"))?.Text ?? string.Empty;
-                                Retweets.Add(replyCount);
+                                    string replyCount = article.FindElementSafe(By.CssSelector("button[data-testid='reply']"))?.Text ?? string.Empty;
+                                    Replies.Add(replyCount);
 
-                                string likeCount = article.FindElementSafe(By.CssSelector("button[data-testid='like']"))?.Text ?? string.Empty;
-                                Likes.Add(likeCount);
+                                    string retweetCount = article.FindElementSafe(By.CssSelector("button[data-testid='retweet']"))?.Text ?? string.Empty;
+                                    Retweets.Add(replyCount);
+
+                                    string likeCount = article.FindElementSafe(By.CssSelector("button[data-testid='like']"))?.Text ?? string.Empty;
+                                    Likes.Add(likeCount);
+                                }
                             }
                         }
                         catch(Exception ex)
@@ -103,51 +117,35 @@ public class SelectNewsPost(IUserInterfaceService userInterfaceService,
 
                     Thread.Sleep(1000);
                 };
+
+                // Remove \r\n from all elements in the lists
+                UserNames = RemoveSymbols(UserNames);
+                Dates = FormatTimestamps(RemoveSymbols(Dates));
+                Comments = RemoveSymbols(Comments);
+                Replies = RemoveSymbols(Replies);
+                Retweets = RemoveSymbols(Retweets);
+                Likes = RemoveSymbols(Likes);
+
+                // Initialize the DataTable
+                processedData.Data = new DataTable();
+                processedData.Data.Columns.Add("UserName");
+                processedData.Data.Columns.Add("Date");
+                processedData.Data.Columns.Add("Comment");
+                processedData.Data.Columns.Add("Replies");
+                processedData.Data.Columns.Add("Retweets");
+                processedData.Data.Columns.Add("Likes");
+
+                // Add data to the DataTable
+                for (var i = 0; i < Comments.Count; i++)
+                {
+                    processedData.Data.Rows.Add(UserNames[i], Dates[i], Comments[i], Replies[i], Retweets[i], Likes[i]);
+                }
             }
             catch (Exception ex) 
             {
                 logger.LogError($"An exception occurred while reading the comments: {ex.Message}");
             }
         }
-
-        // Remove \r\n from all elements in the lists
-        UserTags = RemoveSymbols(UserTags);
-        TimeStamps = FormatTimestamps(RemoveSymbols(TimeStamps));
-        Tweets = RemoveSymbols(Tweets);
-        Replies = RemoveSymbols(Replies);
-        Retweets = RemoveSymbols(Retweets);
-        Likes = RemoveSymbols(Likes);
-
-        // Print header
-        UserInterfaceService.DisplayMessage("{0,-30} {1,-30} {2,-50} {3,-10} {4,-10} {5,-10}",
-            nameof(UserTags),
-            nameof(TimeStamps),
-            nameof(Tweets),
-            nameof(Replies),
-            nameof(Retweets),
-            nameof(Likes));
-
-        // Print separator line
-        UserInterfaceService.DisplayMessage(new string('-', 110));
-
-        // Print data rows
-        for (int i = 0; i < UserTags.Count; i++)
-        {
-            UserInterfaceService.DisplayMessage("{0,-30} {1,-30} {2,-50} {3,-10} {4,-10} {5,-10}",
-                UserTags[i],
-                TimeStamps[i],
-                Tweets[i].Length > 47 ? Tweets[i].Substring(0, 47) + "..." : Tweets[i],
-                Replies[i],
-                Retweets[i],
-                Likes[i]);
-        }
-
-        foreach (var comment in Tweets.Distinct())
-        {
-            commentsList.Add(comment);
-        }
-
-        return commentsList;
     }
 
     static List<string> RemoveSymbols(List<string> list)
