@@ -67,7 +67,7 @@ public class SelectNewsPost(ProcessedData processedData, IUserInterfaceService u
         {
             try
             {
-                while (Comments.Distinct().Count() <= commentsCount)
+                while (Comments.Distinct().Count() < commentsCount)
                 {
                     // Wait for page to load using WebDriverWait for better handling
                     WebDriverWait wait = new WebDriverWait(_edgeDriver, TimeSpan.FromSeconds(10));
@@ -78,6 +78,11 @@ public class SelectNewsPost(ProcessedData processedData, IUserInterfaceService u
                     {
                         try
                         {
+                            if (Comments.Distinct().Count() >= commentsCount)
+                            {
+                                break;
+                            }
+
                             var tweetText = article.FindElementSafe(By.CssSelector("div[lang]"))?.Text ?? string.Empty;
  
                             if (!string.IsNullOrEmpty(tweetText))
