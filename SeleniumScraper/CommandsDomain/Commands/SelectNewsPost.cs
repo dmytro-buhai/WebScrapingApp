@@ -21,8 +21,6 @@ public class SelectNewsPost(ProcessedData processedData, IUserInterfaceService u
 
     private EdgeDriver _edgeDriver { get => edgeLauncher.GetEdgeDriver(); }
 
-    private const string DataFilePath = @"C:\dev\temp";
-
     private List<string> UserNames = [];
     private List<string> Dates = [];
     private List<string> Comments = [];

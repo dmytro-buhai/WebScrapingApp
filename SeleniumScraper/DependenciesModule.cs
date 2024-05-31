@@ -9,8 +9,6 @@ using SeleniumScraper.CommandsDomain.Commands;
 using SeleniumScraper.CommandsDomain.Managers;
 using SeleniumScraper.Services;
 using SeleniumScraper.Services.Commands;
-using System.Data;
-using System.Net.Http.Headers;
 
 namespace SeleniumScraper
 {
@@ -38,9 +36,8 @@ namespace SeleniumScraper
             builder.RegisterType<NavigateCommand>().As<ICommand>().InstancePerLifetimeScope();
             builder.RegisterType<SelectNewsPost>().As<ICommand>().InstancePerLifetimeScope();
             builder.RegisterType<DisplayParsedComments>().As<ICommand>().InstancePerLifetimeScope();
+            builder.RegisterType<SaveDataCommand>().As<ICommand>().InstancePerLifetimeScope();
             builder.RegisterType<StopLauncherCommand>().As<ICommand>().InstancePerLifetimeScope();
-
-            
 
             // Services
             builder.RegisterType<CommandManager>().As<ICommandManager>().SingleInstance();
