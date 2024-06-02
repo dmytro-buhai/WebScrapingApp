@@ -1,7 +1,7 @@
-﻿using NLog;
+﻿using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Support.UI;
 
 namespace SeleniumScraper
 {
@@ -9,33 +9,46 @@ namespace SeleniumScraper
     {
         private const string EdgeDriverPath = @"C:\Dev\drivers\msedgedriver.exe";
         private readonly string EdgeUserDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft\\Edge\\User Data1");
-        private readonly EdgeDriver _driver;
-        private readonly ILogger _logger;
+        private readonly ILogger<EdgeLauncher> _logger;
+        
+        public EdgeDriverService EdgeDriverService {get; private set;}
+        public EdgeOptions EdgeOptions {get; private set;}
 
-        public EdgeLauncher(ILogger logger)
+        private EdgeDriver? Driver { get; set; } 
+
+        public EdgeLauncher(ILogger<EdgeLauncher> logger)
         {
-            var edgeOptions = new EdgeOptions();
-            edgeOptions.AddArgument($"--user-data-dir={EdgeUserDataPath}");
-            edgeOptions.AddArgument("--profile-directory=Profile 1");
+            EdgeDriverService = EdgeDriverService.CreateDefaultService(EdgeDriverPath);
+            EdgeDriverService.HideCommandPromptWindow = true;
 
-            _driver = new EdgeDriver(EdgeDriverPath, edgeOptions);
+            EdgeOptions = new EdgeOptions();
+            EdgeOptions.AddArgument("--remote-debugging-port=9222");
+            EdgeOptions.AddArgument($"--user-data-dir={EdgeUserDataPath}");
+            EdgeOptions.AddArgument("--profile-directory=Profile 1");
+            
             _logger = logger;
         }
 
-        public EdgeDriver GetEdgeDriver() => _driver;
+        public EdgeDriver GetEdgeDriver() => Driver!;
 
-        public void SendKeys(string keys) 
-        { }
+        public void StartLauncher()
+        {
+            _logger.LogInformation("EdgeLauncher - Started");
+            Driver = new EdgeDriver(EdgeDriverService, EdgeOptions);
+        }
 
         public void StopLauncher()
         {
-            _driver?.Quit();
+            Driver?.Quit();
         }
+
+        public void SendKeys(string keys)
+        { }
 
         public void Dispose()
         {
-            _driver?.Quit();
-            _logger.Log(NLog.LogLevel.Info, $"EdgeLauncher - Stoped");
+            Driver?.Quit();
+            _logger.LogInformation($"EdgeLauncher - Stoped");
             GC.SuppressFinalize(this);
         }
     }

@@ -8,7 +8,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Autofac" />
+		<PackageReference Include="Autofac.Extensions.DependencyInjection" />
+		<PackageReference Include="BetterConsoleTables" />
+		<PackageReference Include="Microsoft.Extensions.Logging" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Configuration" />
 		<PackageReference Include="NLog" />
+		<PackageReference Include="NLog.Extensions.Logging" />
 		<PackageReference Include="Selenium.WebDriver" />
 	</ItemGroup>
 
